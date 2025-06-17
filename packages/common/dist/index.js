@@ -25,4 +25,5 @@ Object.defineProperty(exports, "testConnection", { enumerable: true, get: functi
 var Translation_1 = require("./models/Translation");
 Object.defineProperty(exports, "Translation", { enumerable: true, get: function () { return __importDefault(Translation_1).default; } });
 __exportStar(require("./services/rabbitmq"), exports);
+__exportStar(require("./utils/formatter"), exports);
 //# sourceMappingURL=index.js.map
