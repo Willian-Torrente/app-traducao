@@ -1,0 +1,25 @@
+{
+  "name": "@app/common",
+  "version": "1.0.0",
+  "description": "Pacote compartilhado com modelos e configs de DB",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "@types/pg": "^8.15.4",
+    "@types/sequelize": "^4.28.20",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "pg": "^8.16.0",
+    "sequelize": "^6.37.7",
+    "uuidv7": "^1.0.2"
+  }
+}

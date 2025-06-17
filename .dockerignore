@@ -1,0 +1,16 @@
+# Ignorar dependências, pois elas serão instaladas dentro do contêiner
+node_modules
+packages/*/node_modules
+
+# Ignorar arquivos de build, pois serão gerados no contêiner
+packages/*/dist
+packages/*/tsconfig.tsbuildinfo
+
+# Ignorar arquivos de ambiente e de log
+.env
+*.log
+npm-debug.log
+
+# Ignorar diretórios do Git e de IDEs
+.git
+.vscode

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/common/*": ["packages/common/src/*"],
+      "@app/common": ["packages/common/src"]
+    }
+  },
+  "references": [
+    { "path": "./packages/common" },
+    { "path": "./packages/translation-api" },
+    { "path": "./packages/translation-worker" }
+  ]
+}
