@@ -11,6 +11,9 @@ build/
 # TypeScript
 *.tsbuildinfo
 **/*.tsbuildinfo
+*.d.ts
+*.js
+*.js.map
 
 # Logs
 logs/

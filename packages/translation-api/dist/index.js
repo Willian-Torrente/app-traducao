@@ -4,15 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const sequelize_1 = require("sequelize");
-const Translation_1 = __importDefault(require("../../common/dist/models/Translation"));
-// Crie uma instância do Sequelize para Postgres
-const sequelize = new sequelize_1.Sequelize(process.env.DB_NAME || "nome_do_banco", process.env.DB_USER || "usuario", process.env.DB_PASSWORD || "senha", {
-    host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DB_PORT) || 5432,
-    dialect: "postgres",
-    logging: false,
-});
+// Importa TUDO do nosso pacote comum, incluindo as novas funções
+const common_1 = require("@app/common");
+common_1.sequelize.sync();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 app.use(express_1.default.json());
@@ -29,12 +23,13 @@ app.post("/translations", async (req, res) => {
                 message: "Campos obrigatórios ausentes: originalText, sourceLanguage, targetLanguage",
             });
         }
-        const newTranslation = await Translation_1.default.create({ originalText, sourceLanguage, targetLanguage }, { returning: true });
-        const requestId = newTranslation.id;
-        console.log(`[API] Requisição de tradução ${requestId} criada. Deveria ser enviada para a fila.`);
+        const newTranslation = await common_1.Translation.create({ originalText, sourceLanguage, targetLanguage }, { returning: true });
+        // AQUI ESTÁ A INTEGRAÇÃO: Publica a mensagem na fila
+        const queueName = "translation_requests";
+        (0, common_1.publishToQueue)(queueName, JSON.stringify(newTranslation));
         return res.status(202).json({
             message: "Requisição de tradução recebida e está na fila para processamento.",
-            requestId: requestId,
+            requestId: newTranslation.id,
         });
     }
     catch (error) {
@@ -42,21 +37,34 @@ app.post("/translations", async (req, res) => {
         return res.status(500).json({ message: "Erro interno do servidor." });
     }
 });
-// ========= ROTA DE CONSULTA DE STATUS =========
-app.get("/translations/:requestId", (req, res) => {
-    const { requestId } = req.params;
-    return res.send(`A ser implementado: Status para a requisição ${requestId}`);
-});
-// Inicia o servidor
-app.listen(port, async () => {
-    console.log(`✅ Translation API escutando na porta ${port}`);
+// ========= ROTA DE CONSULTA DE STATUS - VERSÃO FINAL =========
+app.get("/translations/:requestId", async (req, res) => {
     try {
-        await sequelize.authenticate();
-        console.log("✅ Conexão com o banco de dados estabelecida.");
-        await sequelize.sync();
+        const { requestId } = req.params;
+        // Usa o método findByPk (Find by Primary Key) do Sequelize
+        const translation = await common_1.Translation.findByPk(requestId);
+        // Se não encontrar nenhum registro com esse ID, retorna 404
+        if (!translation) {
+            return res.status(404).json({ message: "Tradução não encontrada." });
+        }
+        // Se encontrar, retorna o objeto completo da tradução com status 200
+        return res.status(200).json(translation);
     }
     catch (error) {
-        console.error("Não foi possível conectar ao Postgres:", error);
+        console.error("[API] Erro ao consultar a tradução:", error);
+        return res.status(500).json({ message: "Erro interno do servidor." });
+    }
+});
+// INICIALIZAÇÃO ATUALIZADA
+app.listen(port, async () => {
+    try {
+        console.log(`✅ Translation API escutando na porta ${port}`);
+        await (0, common_1.testConnection)(); // Conecta ao DB
+        await (0, common_1.initRabbitMQ)(); // Conecta ao RabbitMQ
+    }
+    catch (error) {
+        console.error("❌ Failed to start the API:", error);
+        process.exit(1);
     }
 });
 //# sourceMappingURL=index.js.map

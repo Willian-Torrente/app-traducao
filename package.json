@@ -11,14 +11,17 @@
     "build:common": "npx tsc --build packages/common",
     "build:apps": "npx tsc --build packages/translation-api packages/translation-worker",
     "build": "npm run build:common && npm run build:apps",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest" 
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.23",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
